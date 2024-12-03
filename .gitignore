@@ -1,2 +1,4 @@
 python-nix-venv
 .direnv
+.pytest_cache
+__pycache__
