@@ -1,4 +1,5 @@
 from typing import List
+import re
 
 
 def parse_input() -> List[List[int]]:
@@ -10,62 +11,38 @@ def parse_input() -> List[List[int]]:
     return lines
 
 
-def _construct_operands_and_aggregate_result(split_delimited_instructions: List[str]):
-    aggregator = 0
-    operands = [
-        val
-        for val in split_delimited_instructions
-        if 7 >= len(val) >= 3 and val[0].isdigit() and val[-1].isdigit()
-    ]
-
-    for pair in operands:
-        operand1, operand2 = pair.split(",")
-        aggregator += int(operand1) * int(operand2)
-
-    return aggregator
-
-
 def multiply(instructions: List[str]) -> int:
     result = 0
     for instruction in instructions:
-        # Delmit the mul instructions to identify them.
-        delimited_instruction = instruction.replace("mul(", "DELIMITER").replace(
-            ")", "DELIMITER"
-        )
-        split_delimited_instructions = delimited_instruction.split("DELIMITER")
-
-        result += _construct_operands_and_aggregate_result(
-            split_delimited_instructions=split_delimited_instructions
-        )
-
+        # Below regex matches "mul" followed by a number made of 1-3 digits, followed by "," followed by another number made of 1-3 digits.
+        matches = re.findall(r"mul\([0-9]{1,3},[0-9]{1,3}\)", instruction)
+        for match in matches:
+            # Grab the operands from the match
+            operand1, operand2 = re.findall("[0-9]{1,3}", match)
+            result += int(operand1) * int(operand2)
     return result
 
 
-def multiply_part2(instructions: List[str]):
-    do = True
+def multiply_part2(instructions: List[str]) -> int:
     result = 0
+    do = True
     for instruction in instructions:
-        delimited_instruction = instruction.replace(
-            "don't()", "DELIMITERdon't()DELIMITER"
-        ).replace("do()", "DELIMITERdo()DELIMITER")
-        split_delimited_instruction = delimited_instruction.split("DELIMITER")
-        for parsed_instruction in split_delimited_instruction:
-            if parsed_instruction == "do()":
+        # The regex pattern below matches "do()"
+        # OR "mul" followed by a number made of 1-3 digits, followed by "," followed by another number made of 1-3 digits,
+        # OR "don't()"
+        matches = re.findall(
+            r"do\(\)|mul\([0-9]{1,3},[0-9]{1,3}\)|don't\(\)", instruction
+        )
+        for match in matches:
+            if match == "do()":
                 do = True
                 continue
-            elif parsed_instruction == "don't()":
+            elif match == "don't()":
                 do = False
                 continue
             if do:
-                delimited_parsed_instruction = parsed_instruction.replace(
-                    "mul(", "MULDELIMITER"
-                ).replace(")", "MULDELIMITER")
-                split_delimited_parsed_instruction = delimited_parsed_instruction.split(
-                    "MULDELIMITER"
-                )
-                result += _construct_operands_and_aggregate_result(
-                    split_delimited_instructions=split_delimited_parsed_instruction
-                )
+                operand1, operand2 = re.findall("[0-9]{1,3}", match)
+                result += int(operand1) * int(operand2)
     return result
 
 
