@@ -1,7 +1,7 @@
 # Advent of Code 2024
 
 ## Structure
-The solution for each day is found in the relevant day sub directory (i.e., day 1's solution is present in `day1/`).
+The solution for each day is found in the relevant day sub directory (i.e., day 1's solution is present in `day_01/`).
 
 ## Installation
 This repo uses nix, and provides a flake for the relevant tooling installation. The first time you spin up this repo, run:
