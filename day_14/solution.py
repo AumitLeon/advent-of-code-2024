@@ -2,6 +2,7 @@ from typing import List
 import numpy as np
 from tqdm import tqdm
 from scipy.stats import entropy
+import matplotlib.pyplot as plt
 
 ROW_DIMENSION = 103
 COLUMN_DIMENSION = 101
@@ -240,9 +241,23 @@ def get_board_with_tree(
         robots=robots, row_dimension=row_dimension, col_dimension=col_dimension
     )
     for _ in range(iteration + 1):
+        # plt.figure(figsize=(10, 10))
         if _ == iteration:
             return board
         board.advance_positions()
+
+
+def visualize_tree(array: List[List[int | str]], iteration: int):
+    # Convert the array to a numerical format for visualization
+    numerical_array = np.array(
+        [[int(x) if x != "." else 0 for x in row] for row in array]
+    )
+
+    plt.clf()  # Clear the current figure
+    plt.imshow(numerical_array, cmap="viridis", interpolation="nearest")
+    plt.title(f"Iteration: {iteration}")
+
+    plt.savefig("tree.png")
 
 
 if __name__ == "__main__":
@@ -250,7 +265,7 @@ if __name__ == "__main__":
     result_part1 = part_1(
         robots=robots, row_dimension=ROW_DIMENSION, col_dimension=COLUMN_DIMENSION
     )
-    print(result_part1)
+    print(f"Solution part 1: {result_part1}")
 
     # Simple heuristic to print out boards that have small "entropy"
     # robots = parse_input()
@@ -273,4 +288,7 @@ if __name__ == "__main__":
         col_dimension=COLUMN_DIMENSION,
         iteration=result_part2,
     )
+
+    # Visualize
+    visualize_tree(board_with_tree.construct_board(), result_part2)
     board_with_tree.print_board()
