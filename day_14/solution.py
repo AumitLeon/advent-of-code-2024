@@ -3,6 +3,8 @@ import numpy as np
 from tqdm import tqdm
 from scipy.stats import entropy
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation, PillowWriter
+
 
 ROW_DIMENSION = 103
 COLUMN_DIMENSION = 101
@@ -234,6 +236,41 @@ def part_2_minimize_entropy(
     return entropies.index(min_entropy) + 1
 
 
+def part_2_animate(
+    robots: List[Robot], row_dimension: int, col_dimension: int, iterations: int
+):
+    """
+    Utility function to animate the robot movements
+    """
+    board = Board(
+        robots=robots, row_dimension=row_dimension, col_dimension=col_dimension
+    )
+    current_board = board.construct_board()
+
+    # Convert the array to a numerical format for visualization
+    numerical_array = np.array(
+        [[int(x) if x != "." else 0 for x in row] for row in current_board]
+    )
+
+    fig, ax = plt.subplots(figsize=(8, 7))
+    im = ax.imshow(numerical_array, cmap="viridis", interpolation="nearest")
+    title = ax.set_title("Iteration: 0")  # Initial title
+
+    def update(frame):
+        board.advance_positions()
+        current_board = board.construct_board()
+        numerical_array = np.array(
+            [[int(x) if x != "." else 0 for x in row] for row in current_board]
+        )
+        im.set_array(numerical_array)
+        title.set_text(f"Iteration: {frame}")
+        return [im, title]
+
+    ani = FuncAnimation(fig, update, frames=iterations, interval=0.1)
+    ani.save("robot_movement.gif", writer=PillowWriter(fps=10))  # Set fps as needed
+    plt.show()
+
+
 def get_board_with_tree(
     robots: List[Robot], row_dimension: int, col_dimension: int, iteration: int
 ):
@@ -270,6 +307,15 @@ if __name__ == "__main__":
     # Simple heuristic to print out boards that have small "entropy"
     # robots = parse_input()
     # part_2_simple_heuristic(robots=robots, row_dimension=ROW_DIMENSION, col_dimension=COLUMN_DIMENSION)
+
+    # Animate part 2 movements
+    # robots = parse_input()
+    # result_part2 = part_2_animate(
+    #     robots=robots,
+    #     row_dimension=ROW_DIMENSION,
+    #     col_dimension=COLUMN_DIMENSION,
+    #     iterations=10000,
+    # )
 
     # Solution that actually minimizes entropy
     robots = parse_input()
